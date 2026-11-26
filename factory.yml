@@ -1,0 +1,16 @@
+version: 1
+name: Smoke test factory
+tagline: Checks that a real post reaches the site.
+use_cases: [bugfix]
+stack: [nextjs, postgres]
+harnesses: [claude-code]
+demo:
+  type: pr
+  url: https://github.com/acme/shop/pull/42
+pipeline:
+  - id: analysis
+    name: Analysis
+    files: [skills/analyse/SKILL.md]
+  - id: code
+    name: Code
+    files: [skills/tdd/SKILL.md]
