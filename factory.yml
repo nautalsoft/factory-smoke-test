@@ -1,6 +1,6 @@
 version: 1
 name: Smoke test factory
-tagline: Checks that a real post reaches the site.
+tagline: Checks that a push updates the listing.
 use_cases: [bugfix]
 stack: [nextjs, postgres]
 harnesses: [claude-code]
