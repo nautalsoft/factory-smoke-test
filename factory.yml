@@ -14,8 +14,6 @@ install:
     - name: everything
       command: npx -y @modelcontextprotocol/server-everything@2.4.0
       env: [SMOKE_TEST_TOKEN]
-    - name: deepwiki
-      url: https://mcp.deepwiki.com/mcp
   env:
     - name: SMOKE_TEST_TOKEN
       why: The everything server reads it. Any value works.
@@ -34,7 +32,6 @@ pipeline:
   - id: code
     name: Code
     files: [skills/tdd/SKILL.md]
-    permissions: [network]
     install:
       mcp:
         - name: memory
