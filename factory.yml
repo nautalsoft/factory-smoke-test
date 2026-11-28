@@ -1,16 +1,53 @@
 version: 1
 name: Smoke test factory
-tagline: Checks that a push updates the listing.
+tagline: Exercises the install and create skills before each release.
 use_cases: [bugfix]
 stack: [nextjs, postgres]
-harnesses: [claude-code]
+harnesses: [claude-code, codex]
 demo:
   type: pr
   url: https://github.com/acme/shop/pull/42
+install:
+  files: [AGENTS.md, .editorconfig]
+  tools: [git, node]
+  mcp:
+    - name: everything
+      command: npx -y @modelcontextprotocol/server-everything@2.4.0
+      env: [SMOKE_TEST_TOKEN]
+    - name: deepwiki
+      url: https://mcp.deepwiki.com/mcp
+  env:
+    - name: SMOKE_TEST_TOKEN
+      why: The everything server reads it. Any value works.
+  setup:
+    - run: ./scripts/setup.sh
+      why: Writes .smoke-test/setup-ran, so the scenario sees that setup ran.
 pipeline:
   - id: analysis
     name: Analysis
     files: [skills/analyse/SKILL.md]
+    install:
+      tools: [grep]
+      env:
+        - name: SMOKE_TEST_UNSET
+          why: Left unset on purpose, so the install lists it at the end.
   - id: code
     name: Code
     files: [skills/tdd/SKILL.md]
+    permissions: [network]
+    install:
+      mcp:
+        - name: memory
+          command: npx -y @modelcontextprotocol/server-memory@2.2.2
+      setup:
+        - run: node --version
+          why: Shows the Node version the step's tests run on.
+  - id: release
+    name: Release
+    files: [skills/release/SKILL.md]
+    install:
+      setup:
+        - run: test -f CHANGELOG.md
+          why: The release step appends to CHANGELOG.md. Fails when the project has none.
+        - run: mkdir -p .smoke-test && touch .smoke-test/release-ready
+          why: Records that the release step is set up. Never runs when the command before it fails.
